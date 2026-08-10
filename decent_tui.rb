@@ -177,10 +177,12 @@ module Decent
     end
 
     def [](x, y)
+      return " " if x < 0 || y < 0 || x >= @size[0] || y >= @size[1]
       @str[*offset(x, y)]
     end
 
     def []=(x, y, val)
+      return if x < 0 || y < 0 || x >= @size[0] || y >= @size[1]
       @str[*offset(x, y)] = val
     end
 
@@ -189,7 +191,14 @@ module Decent
     end
 
     def template(str, pos)
-      @str.template str, offset(*pos), @size
+      local_clip = [
+        @size[0] - pos[0],
+        @size[1] - pos[1]
+      ]
+
+      return if local_clip[0] <= 0 || local_clip[1] <= 0
+
+      @str.template str, offset(*pos), local_clip
     end
 
     def sub_templater((x, y), (width, height))
